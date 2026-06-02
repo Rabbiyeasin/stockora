@@ -1,149 +1,152 @@
+<template>
+  <div class="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <div>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Create your account
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+          Start your 14-day free trial
+        </p>
+      </div>
+
+      <form class="mt-8 space-y-6" @submit.prevent="submit">
+        <div class="rounded-md shadow-sm space-y-4">
+          <div>
+            <label for="business_name" class="label">Business Name</label>
+            <input
+              id="business_name"
+              v-model="form.business_name"
+              type="text"
+              required
+              class="input"
+              :class="{ 'input-error': form.errors.business_name }"
+              placeholder="Your Business Name"
+            />
+            <div v-if="form.errors.business_name" class="error-text">
+              {{ form.errors.business_name }}
+            </div>
+          </div>
+
+          <div>
+            <label for="name" class="label">Your Name</label>
+            <input
+              id="name"
+              v-model="form.name"
+              type="text"
+              required
+              class="input"
+              :class="{ 'input-error': form.errors.name }"
+              placeholder="John Doe"
+            />
+            <div v-if="form.errors.name" class="error-text">
+              {{ form.errors.name }}
+            </div>
+          </div>
+
+          <div>
+            <label for="email" class="label">Email Address</label>
+            <input
+              id="email"
+              v-model="form.email"
+              type="email"
+              autocomplete="email"
+              required
+              class="input"
+              :class="{ 'input-error': form.errors.email }"
+              placeholder="you@example.com"
+            />
+            <div v-if="form.errors.email" class="error-text">
+              {{ form.errors.email }}
+            </div>
+          </div>
+
+          <div>
+            <label for="phone" class="label">Phone Number (Optional)</label>
+            <input
+              id="phone"
+              v-model="form.phone"
+              type="tel"
+              class="input"
+              :class="{ 'input-error': form.errors.phone }"
+              placeholder="+880 1XXX XXXXXX"
+            />
+            <div v-if="form.errors.phone" class="error-text">
+              {{ form.errors.phone }}
+            </div>
+          </div>
+
+          <div>
+            <label for="password" class="label">Password</label>
+            <input
+              id="password"
+              v-model="form.password"
+              type="password"
+              autocomplete="new-password"
+              required
+              class="input"
+              :class="{ 'input-error': form.errors.password }"
+              placeholder="••••••••"
+            />
+            <div v-if="form.errors.password" class="error-text">
+              {{ form.errors.password }}
+            </div>
+          </div>
+
+          <div>
+            <label for="password_confirmation" class="label">Confirm Password</label>
+            <input
+              id="password_confirmation"
+              v-model="form.password_confirmation"
+              type="password"
+              autocomplete="new-password"
+              required
+              class="input"
+              :class="{ 'input-error': form.errors.password_confirmation }"
+              placeholder="••••••••"
+            />
+            <div v-if="form.errors.password_confirmation" class="error-text">
+              {{ form.errors.password_confirmation }}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            :disabled="form.processing"
+            class="btn btn-primary w-full disabled:opacity-50"
+          >
+            <span v-if="form.processing">Creating account...</span>
+            <span v-else>Create account</span>
+          </button>
+        </div>
+
+        <div class="text-center">
+          <Link :href="route('login')" class="text-sm text-indigo-600 hover:text-indigo-500">
+            Already have an account? Sign in
+          </Link>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
+
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import AuthLayout from '@/Layouts/AuthLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import Checkbox from '@/Components/Checkbox.vue';
+import { Link, useForm } from '@inertiajs/vue3';
 
 const form = useForm({
-    business_name: '',
-    name: '',
-    email: '',
-    phone: '',
-    password: '',
-    password_confirmation: '',
-    terms: false,
+  business_name: '',
+  name: '',
+  email: '',
+  phone: '',
+  password: '',
+  password_confirmation: '',
 });
 
 const submit = () => {
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-    });
+  form.post(route('register'), {
+    onFinish: () => form.reset('password', 'password_confirmation'),
+  });
 };
 </script>
-
-<template>
-    <AuthLayout>
-        <Head title="Register" />
-
-        <div class="mb-4 text-center">
-            <h2 class="text-2xl font-bold text-gray-900">Create Your Account</h2>
-            <p class="mt-2 text-sm text-gray-600">Start your 14-day free trial</p>
-        </div>
-
-        <form @submit.prevent="submit">
-            <!-- Business Name -->
-            <div>
-                <InputLabel for="business_name" value="Business Name" />
-                <TextInput
-                    id="business_name"
-                    v-model="form.business_name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    required
-                    autofocus
-                    autocomplete="organization"
-                />
-                <InputError class="mt-2" :message="form.errors.business_name" />
-            </div>
-
-            <!-- Name -->
-            <div class="mt-4">
-                <InputLabel for="name" value="Your Full Name" />
-                <TextInput
-                    id="name"
-                    v-model="form.name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="name"
-                />
-                <InputError class="mt-2" :message="form.errors.name" />
-            </div>
-
-            <!-- Email -->
-            <div class="mt-4">
-                <InputLabel for="email" value="Email Address" />
-                <TextInput
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="username"
-                />
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
-
-            <!-- Phone -->
-            <div class="mt-4">
-                <InputLabel for="phone" value="Phone Number (Optional)" />
-                <TextInput
-                    id="phone"
-                    v-model="form.phone"
-                    type="tel"
-                    class="mt-1 block w-full"
-                    autocomplete="tel"
-                />
-                <InputError class="mt-2" :message="form.errors.phone" />
-            </div>
-
-            <!-- Password -->
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-                <TextInput
-                    id="password"
-                    v-model="form.password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="new-password"
-                />
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
-
-            <!-- Confirm Password -->
-            <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Confirm Password" />
-                <TextInput
-                    id="password_confirmation"
-                    v-model="form.password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="new-password"
-                />
-                <InputError class="mt-2" :message="form.errors.password_confirmation" />
-            </div>
-
-            <!-- Terms -->
-            <div class="mt-4 block">
-                <label class="flex items-center">
-                    <Checkbox v-model:checked="form.terms" name="terms" required />
-                    <span class="ml-2 text-sm text-gray-600">
-                        I agree to the
-                        <a href="#" class="text-indigo-600 hover:text-indigo-500">Terms of Service</a>
-                        and
-                        <a href="#" class="text-indigo-600 hover:text-indigo-500">Privacy Policy</a>
-                    </span>
-                </label>
-                <InputError class="mt-2" :message="form.errors.terms" />
-            </div>
-
-            <div class="mt-6 flex items-center justify-between">
-                <Link
-                    :href="route('login')"
-                    class="text-sm text-gray-600 hover:text-gray-900"
-                >
-                    Already registered?
-                </Link>
-
-                <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Register
-                </PrimaryButton>
-            </div>
-        </form>
-    </AuthLayout>
-</template>

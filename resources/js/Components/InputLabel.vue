@@ -1,14 +1,14 @@
-<template>
-    <label :for="forInput" class="block text-sm font-medium text-gray-700">
-        <slot />
-    </label>
-</template>
-
 <script setup>
 defineProps({
-    forInput: {
+    value: {
         type: String,
-        default: ''
-    }
-})
+    },
+});
 </script>
+
+<template>
+    <label class="block font-medium text-sm text-gray-700">
+        <span v-if="value">{{ value }}</span>
+        <span v-else><slot /></span>
+    </label>
+</template>

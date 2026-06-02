@@ -14,12 +14,6 @@ class Role extends Model
         'name',
         'slug',
         'description',
-        'is_system_role',
-        'level',
-    ];
-
-    protected $casts = [
-        'is_system_role' => 'boolean',
     ];
 
     public function tenant()
@@ -27,16 +21,13 @@ class Role extends Model
         return $this->belongsTo(Tenant::class);
     }
 
-    public function permissions()
-    {
-        return $this->belongsToMany(Permission::class, 'role_permission')
-            ->withTimestamps();
-    }
-
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_role')
-            ->withPivot('store_id', 'assigned_at', 'assigned_by')
-            ->withTimestamps();
+        return $this->hasMany(User::class);
+    }
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class);
     }
 }
