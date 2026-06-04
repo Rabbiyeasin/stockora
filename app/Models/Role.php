@@ -26,8 +26,36 @@ class Role extends Model
         return $this->hasMany(User::class);
     }
 
-    public function permissions()
+public function permissions()
+{
+    return $this->belongsToMany(
+        Permission::class,
+        'role_permission',
+        'role_id',
+        'permission_id'
+    );
+}
+
+    public function hasPermission(string $permission): bool
     {
-        return $this->belongsToMany(Permission::class);
+        return $this->permissions()->where('slug', $permission)->exists();
+    }
+
+    public function givePermissionTo(Permission|string $permission): void
+    {
+        if (is_string($permission)) {
+            $permission = Permission::where('slug', $permission)->firstOrFail();
+        }
+
+        $this->permissions()->syncWithoutDetaching([$permission->id]);
+    }
+
+    public function revokePermissionTo(Permission|string $permission): void
+    {
+        if (is_string($permission)) {
+            $permission = Permission::where('slug', $permission)->firstOrFail();
+        }
+
+        $this->permissions()->detach($permission->id);
     }
 }

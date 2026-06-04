@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Permission;
 use App\Models\Store;
 use Illuminate\Support\Facades\Hash;
 
@@ -13,6 +14,8 @@ class TenantSeeder extends Seeder
 {
     public function run(): void
     {
+        $adminPermissions = Permission::all();
+
         // Tenant 1
         $tenant1 = Tenant::create([
             'client_id' => '100001',
@@ -27,8 +30,10 @@ class TenantSeeder extends Seeder
             'tenant_id' => $tenant1->id,
             'name' => 'Admin',
             'slug' => 'admin',
-            'description' => 'Full access',
+            'description' => 'Full access to all features',
         ]);
+
+        $role1->permissions()->sync($adminPermissions->pluck('id'));
 
         User::create([
             'tenant_id' => $tenant1->id,
@@ -56,19 +61,49 @@ class TenantSeeder extends Seeder
             'trial_ends_at' => now()->addDays(7),
         ]);
 
-        $role2 = Role::create([
+        $role2Admin = Role::create([
             'tenant_id' => $tenant2->id,
             'name' => 'Admin',
             'slug' => 'admin',
             'description' => 'Full access',
         ]);
 
+        $role2Admin->permissions()->sync($adminPermissions->pluck('id'));
+
+        $role2Staff = Role::create([
+            'tenant_id' => $tenant2->id,
+            'name' => 'Staff',
+            'slug' => 'staff',
+            'description' => 'Limited access',
+        ]);
+
+        $staffPermissions = Permission::whereIn('slug', [
+            'dashboard.view',
+            'products.view',
+            'sales.view',
+            'sales.create',
+            'pos.access',
+            'customers.view',
+            'customers.create',
+        ])->pluck('id');
+
+        $role2Staff->permissions()->sync($staffPermissions);
+
         User::create([
             'tenant_id' => $tenant2->id,
-            'name' => 'Test User',
-            'email' => 'user@test.com',
+            'name' => 'Test Admin',
+            'email' => 'admin@test.com',
             'password' => Hash::make('password'),
-            'role_id' => $role2->id,
+            'role_id' => $role2Admin->id,
+            'is_active' => true,
+        ]);
+
+        User::create([
+            'tenant_id' => $tenant2->id,
+            'name' => 'Test Staff',
+            'email' => 'staff@test.com',
+            'password' => Hash::make('password'),
+            'role_id' => $role2Staff->id,
             'is_active' => true,
         ]);
 

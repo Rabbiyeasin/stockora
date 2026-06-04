@@ -1,33 +1,72 @@
 <template>
   <div class="min-h-screen bg-gray-100">
-    <!-- Navigation -->
     <nav class="bg-white border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           <div class="flex">
-            <!-- Logo -->
             <div class="flex-shrink-0 flex items-center">
               <h1 class="text-xl font-bold text-indigo-600">SaaS Platform</h1>
             </div>
 
-            <!-- Navigation Links -->
             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-              <NavLink :href="route('app.dashboard', { client_id: clientId })" :active="route().current('app.dashboard')">
+              <NavLink 
+                v-if="hasPermission('dashboard.view')"
+                :href="route('app.dashboard', { client_id: clientId })" 
+                :active="route().current('app.dashboard')"
+              >
                 Dashboard
               </NavLink>
-              <NavLink href="#" :active="false">
+              
+              <NavLink 
+                v-if="hasPermission('products.view')"
+                href="#" 
+                :active="false"
+              >
                 Products
               </NavLink>
-              <NavLink href="#" :active="false">
+              
+              <NavLink 
+                v-if="hasPermission('sales.view')"
+                href="#" 
+                :active="false"
+              >
                 Sales
               </NavLink>
-              <NavLink href="#" :active="false">
+              
+              <NavLink 
+                v-if="hasPermission('pos.access')"
+                href="#" 
+                :active="false"
+              >
+                POS
+              </NavLink>
+              
+              <NavLink 
+                v-if="hasPermission('customers.view')"
+                href="#" 
+                :active="false"
+              >
                 Customers
+              </NavLink>
+              
+              <NavLink 
+                v-if="hasPermission('reports.view')"
+                href="#" 
+                :active="false"
+              >
+                Reports
+              </NavLink>
+              
+              <NavLink 
+                v-if="hasPermission('settings.view')"
+                href="#" 
+                :active="false"
+              >
+                Settings
               </NavLink>
             </div>
           </div>
 
-          <!-- User Dropdown -->
           <div class="hidden sm:flex sm:items-center sm:ml-6">
             <div class="ml-3 relative" v-click-outside="closeDropdown">
               <div>
@@ -48,7 +87,6 @@
                 </button>
               </div>
 
-              <!-- Dropdown Menu -->
               <Transition
                 enter-active-class="transition ease-out duration-200"
                 enter-from-class="transform opacity-0 scale-95"
@@ -64,10 +102,17 @@
                   <div class="px-4 py-2 text-xs text-gray-400 border-b">
                     Client ID: <span class="font-mono font-bold">{{ clientId }}</span>
                   </div>
+                  <div class="px-4 py-2 text-xs text-gray-400 border-b">
+                    Role: <span class="font-semibold">{{ $page.props.auth.user.role?.name }}</span>
+                  </div>
                   <DropdownLink href="#" @click="showingDropdown = false">
                     Profile
                   </DropdownLink>
-                  <DropdownLink href="#" @click="showingDropdown = false">
+                  <DropdownLink 
+                    v-if="hasPermission('settings.view')"
+                    href="#" 
+                    @click="showingDropdown = false"
+                  >
                     Settings
                   </DropdownLink>
                   <div class="border-t border-gray-100"></div>
@@ -79,7 +124,6 @@
             </div>
           </div>
 
-          <!-- Mobile menu button -->
           <div class="-mr-2 flex items-center sm:hidden">
             <button
               @click="showingMobileMenu = !showingMobileMenu"
@@ -94,16 +138,29 @@
         </div>
       </div>
 
-      <!-- Mobile menu -->
       <div :class="{ 'block': showingMobileMenu, 'hidden': !showingMobileMenu }" class="sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-          <ResponsiveNavLink :href="route('app.dashboard', { client_id: clientId })" :active="route().current('app.dashboard')">
+          <ResponsiveNavLink 
+            v-if="hasPermission('dashboard.view')"
+            :href="route('app.dashboard', { client_id: clientId })" 
+            :active="route().current('app.dashboard')"
+          >
             Dashboard
           </ResponsiveNavLink>
-          <ResponsiveNavLink href="#" :active="false">
+          
+          <ResponsiveNavLink 
+            v-if="hasPermission('products.view')"
+            href="#" 
+            :active="false"
+          >
             Products
           </ResponsiveNavLink>
-          <ResponsiveNavLink href="#" :active="false">
+          
+          <ResponsiveNavLink 
+            v-if="hasPermission('sales.view')"
+            href="#" 
+            :active="false"
+          >
             Sales
           </ResponsiveNavLink>
         </div>
@@ -126,14 +183,12 @@
       </div>
     </nav>
 
-    <!-- Page Heading -->
     <header v-if="$slots.header" class="bg-white shadow">
       <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <slot name="header" />
       </div>
     </header>
 
-    <!-- Page Content -->
     <main>
       <slot />
     </main>
@@ -143,9 +198,12 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import { usePermission } from '@/Composables/usePermission';
 import NavLink from '@/Components/NavLink.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+
+const { hasPermission } = usePermission();
 
 const showingDropdown = ref(false);
 const showingMobileMenu = ref(false);
@@ -162,7 +220,6 @@ const closeDropdown = () => {
   showingDropdown.value = false;
 };
 
-// Click outside directive
 const vClickOutside = {
   mounted(el, binding) {
     el.clickOutsideEvent = (event) => {
