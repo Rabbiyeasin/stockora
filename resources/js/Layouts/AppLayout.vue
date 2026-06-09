@@ -19,8 +19,8 @@
               
               <NavLink 
                 v-if="hasPermission('products.view')"
-                href="#" 
-                :active="false"
+                :href="route('app.products.index', { client_id: clientId })" 
+                :active="route().current('app.products.*')"
               >
                 Products
               </NavLink>

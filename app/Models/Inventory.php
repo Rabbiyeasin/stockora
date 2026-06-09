@@ -9,7 +9,7 @@ class Inventory extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'product_id',
